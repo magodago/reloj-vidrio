@@ -89,6 +89,7 @@ body{
 #pil::after{content:"";position:absolute;right:-2.6px;top:3.6px;width:1.8px;height:4.6px;background:rgba(255,255,255,.72);border-radius:0 1.5px 1.5px 0}
 #pil i{position:absolute;left:1.4px;top:1.4px;bottom:1.4px;width:calc((27px - 4.6px) * var(--carga,.84));background:rgba(255,255,255,.97);border-radius:2px}
 #pct{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:700 9.5px/1 -apple-system,system-ui,sans-serif;color:#0b0b0e}
+#panel h1{margin-top:calc(var(--btop,0px) + 6px)}
 #v{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 2px);text-align:center;color:#fff;
   font:12px/1 -apple-system,Arial;opacity:.8;transition:opacity .8s;pointer-events:none;z-index:8}
 #v.oculto{opacity:0}
@@ -124,7 +125,7 @@ body{
     <label>Operador<input type="text" id="oper" value="vodafone ES"></label>
     <label>Bater&#237;a %<input type="number" id="bat" min="1" max="100" step="1" value="84"></label>
     <label>Brillo de arriba para tapar la hora (0-100)<input type="range" id="brillo" min="0" max="100" step="5" value="88"></label>
-    <label>Alto de la barra (0 = el del m&#243;vil)<input type="number" id="alto" min="0" max="90" step="1" value="0"></label>
+    <label>Alto de la barra (0 = el del m&#243;vil)<input type="number" id="balto" min="0" max="90" step="1" value="0"></label>
     <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="ver" style="width:auto">Mostrar la barra</label>
   </div>
   </div>
@@ -282,10 +283,10 @@ function pintaBar(){
   pintaHalo();
 }
 cargaBar();
-[['oper',1],['bat',0],['brillo',0],['alto',0]].forEach(function(k){
+[['oper','oper',1],['bat','bat',0],['brillo','brillo',0],['balto','alto',0]].forEach(function(k){
   var el=document.getElementById(k[0]); if(!el)return;
-  el.value=bar[k[0]];
-  el.oninput=function(){bar[k[0]]=k[1]?el.value:+el.value;guardaBar();pintaBar();};
+  el.value=bar[k[1]];
+  el.oninput=function(){bar[k[1]]=k[2]?el.value:+el.value;guardaBar();pintaBar();};
 });
 (function(){var c=document.getElementById('ver'); if(!c)return; c.checked=!!bar.ver;
   c.onchange=function(){bar.ver=c.checked?1:0;guardaBar();pintaBar();};})();
