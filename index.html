@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Reloj">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#f0f2f5">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.png">
 <title>Reloj</title>
@@ -24,14 +24,15 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#000}
+html{background-image:var(--fondo);background-size:cover;background-position:center}
 body{
   font-family:'Barlow Condensed',-apple-system,'Helvetica Neue',Arial,sans-serif;
   -webkit-user-select:none;user-select:none;touch-action:manipulation;
   -webkit-touch-callout:none;overscroll-behavior:none;
 }
-#fondo{position:fixed;inset:0;background-image:var(--fondo);background-size:cover;background-position:center}
+#fondo{position:fixed;inset:0;min-height:100dvh;background-image:var(--fondo);background-size:cover;background-position:center}
 #velo{position:fixed;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,0) 20%,rgba(0,0,0,0) 72%,rgba(0,0,0,.20))}
+  background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,0) 20%,rgba(0,0,0,0) 90%,rgba(0,0,0,.06))}
 
 /* tipografia comun a las dos capas */
 .capa{position:fixed;left:50%;top:var(--top);width:max-content;
@@ -110,7 +111,7 @@ body{
 <svg viewBox="0 0 16 12" width="16" height="12" aria-hidden="true"><path d="M8 11.3 5.8 8.9a3.1 3.1 0 0 1 4.4 0L8 11.3Zm-3.7-4a5.7 5.7 0 0 1 7.4 0l1.3-1.5a7.6 7.6 0 0 0-10 0l1.3 1.5Zm-2.6-2.8a9.4 9.4 0 0 1 12.6 0L15.6 3a11.3 11.3 0 0 0-15.2 0l1.3 1.5Z"/></svg>
 <span id="pil"><i></i><b id="pct">84</b></span></span></div>
 <div id="velo"></div>
-<div id="v">v5</div>
+<div id="v">v6</div>
 <div id="pista"><button type="button" id="elegir">Elegir fondo de pantalla</button></div>
 <div id="aviso"></div>
 
