@@ -93,7 +93,7 @@ body{
 <div id="vidrio"><span class="capa" id="c2"></span></div>
 <span class="capa" id="reloj"></span>
 <div id="velo"></div>
-<div id="v">v1</div>
+<div id="v">v2</div>
 <div id="pista"><button type="button" id="elegir">Elegir fondo de pantalla</button></div>
 <div id="aviso"></div>
 
@@ -111,6 +111,10 @@ body{
     <p style="margin:8px 0 6px">Toca los números y mira cómo cambia la pantalla. Así se clava la forma exacta.</p>
     <label>Minutos de adelanto al arrancar</label>
     <input type="number" id="min" min="1" max="30" step="1">
+    <label>Espera antes de empezar a retroceder (segundos)</label>
+    <input type="number" id="esp" min="0" max="30" step="0.5">
+    <label>Segundos entre minuto y minuto</label>
+    <input type="number" id="paso" min="0.3" max="5" step="0.1">
     <label>Tamaño</label>
     <input type="number" id="alto" step="1">
     <label>Ancho (1 = normal, menos = más estrecho)</label>
@@ -131,8 +135,8 @@ body{
 <script>
 (function(){
   var q=function(s){return document.querySelector(s)};
-  var clav={alto:52.7,kx:0.442,ky:1,top:8.83,izq:0.5,g:700,min:5};
-  var off, fondo=null, forzada=null;
+  var clav={alto:52.7,kx:0.442,ky:1,top:8.83,izq:0.5,g:700,min:5,esp:5,paso:0.9};
+  var off, fondo=null, forzada=null, sec=null;
   var c1=q('#reloj'), c2=q('#c2'), ultimo='';
 
   // ---- parametros en la URL (para pruebas): ?t=11:44&v=1
@@ -184,7 +188,16 @@ body{
 
   // ---------- toques ----------
   var pulsando=false,t0=0,esquina=0, tmr=null;
-  function rearma(){off=clav.min;pinta();avisa('Listo: '+clav.min+' min por delante')}
+  function rearma(){if(sec){clearTimeout(sec);sec=null}off=clav.min;pinta();avisa('Listo: '+clav.min+' min por delante')}
+  function arranca(){                                  // un toque: espera y luego retrocede de uno en uno
+    if(sec||off<=0)return;
+    sec=setTimeout(function(){
+      (function paso(){
+        if(off>0){off--;pinta();sec=setTimeout(paso,clav.paso*1000);}
+        else{sec=null;}
+      })();
+    },clav.esp*1000);
+  }
   function avisa(x){var a=q('#aviso');a.textContent=x;a.style.opacity=1;clearTimeout(a._t);
     a._t=setTimeout(function(){a.style.opacity=0},1300)}
   function dentro(e){return !!(e.target.closest&&(e.target.closest('#panel')||e.target.closest('#pista')))}
@@ -204,14 +217,14 @@ body{
       return;
     }
     if(forzada)return;
-    if(off>0){off--;pinta()}
+    arranca()
   },{passive:true});
   document.addEventListener('click',function(e){                    // raton, para pruebas
     if(dentro(e))return;
     if(e.clientX>innerWidth*0.70&&e.clientY<innerHeight*0.12){esquina++;setTimeout(function(){esquina=0},1500);
       if(esquina>=3){esquina=0;q('#panel').className='abierto';q('#pista').className='oculto'}return}
     if(forzada)return;
-    if(off>0){off--;pinta()}
+    arranca()
   });
 
   // ---------- panel ----------
@@ -259,6 +272,8 @@ body{
     document.getElementById('aviso').style.display='none';
     c1.className='capa';}
   if(par.get('kx'))clav.kx=+par.get('kx');
+  if(par.get('esp'))clav.esp=+par.get('esp');
+  if(par.get('paso'))clav.paso=+par.get('paso');
   if(par.get('ky'))clav.ky=+par.get('ky');
   if(par.get('alto'))clav.alto=+par.get('alto');
   if(par.get('top'))clav.top=+par.get('top');
@@ -266,6 +281,9 @@ body{
   if(par.get('g'))clav.grosor=+par.get('g');
   off=clav.min;
   pintaClav();pintaFondo();vigila();pinta();tick();
+  [['esp','esp'],['paso','paso']].forEach(function(p){var el=q('#'+p[0]);if(!el)return;
+    el.value=clav[p[1]];el.oninput=function(){var v=+el.value;if(v>=0)clav[p[1]]=v;};});
+  window.__arranca=arranca;
   setTimeout(function(){q('#v').className='oculto'},1600);
   window.__reloj={clav:clav,off:function(){return off},pon:function(v){off=v;pinta()}};
 })();
