@@ -77,8 +77,8 @@ body{
 #panel a{color:#6cb6ff}
 .fila{display:flex;gap:10px;align-items:center}
 /* ---- barra de estado falsa + brillo para tapar la hora del sistema ---- */
-#halo{position:fixed;left:0;right:0;top:0;width:100%;z-index:36;pointer-events:none;height:calc(var(--btop,0px) + 10px);background:linear-gradient(180deg,#fff 0,rgba(255,255,255,1) calc(100% - 10px),rgba(255,255,255,0) 100%);opacity:1}
-#barra{position:fixed;left:0;right:0;top:0;height:var(--btop,0px);z-index:38;pointer-events:none;
+#halo{position:fixed;left:0;right:0;top:0;width:100%;height:calc(var(--btop,0px) + 34px);z-index:36;pointer-events:none;background:linear-gradient(180deg,#fff 0,rgba(255,255,255,1) calc(100% - 10px),rgba(255,255,255,0) 100%)}
+#barra{position:fixed;left:0;right:0;top:calc(var(--btop,0px) + 3px);height:26px;z-index:38;pointer-events:none;
   display:flex;align-items:center;justify-content:space-between;overflow:hidden;
   font:600 15px/1 -apple-system,'SF Pro Text',system-ui,sans-serif;color:#0b0b0e}
 #oper{margin-left:26px;letter-spacing:.1px;white-space:nowrap;text-shadow:none}
@@ -110,7 +110,7 @@ body{
 <svg viewBox="0 0 16 12" width="16" height="12" aria-hidden="true"><path d="M8 11.3 5.8 8.9a3.1 3.1 0 0 1 4.4 0L8 11.3Zm-3.7-4a5.7 5.7 0 0 1 7.4 0l1.3-1.5a7.6 7.6 0 0 0-10 0l1.3 1.5Zm-2.6-2.8a9.4 9.4 0 0 1 12.6 0L15.6 3a11.3 11.3 0 0 0-15.2 0l1.3 1.5Z"/></svg>
 <span id="pil"><i></i><b id="pct">84</b></span></span></div>
 <div id="velo"></div>
-<div id="v">v4</div>
+<div id="v">v5</div>
 <div id="pista"><button type="button" id="elegir">Elegir fondo de pantalla</button></div>
 <div id="aviso"></div>
 
