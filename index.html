@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reloj">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Reloj</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fondo:linear-gradient(160deg,#0b1622 0%,#123047 45%,#06121c 100%);
+  --alto:52.7vh; --kx:0.442; --ky:1; --top:8.83%; --dx:0.5%;
+  --grosor:700;
+  --tinte:rgba(255,255,255,.19);
+  --luz:rgba(205,236,255,.60);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#000}
+body{
+  font-family:'Barlow Condensed',-apple-system,'Helvetica Neue',Arial,sans-serif;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;
+  -webkit-touch-callout:none;overscroll-behavior:none;
+}
+#fondo{position:fixed;inset:0;background-image:var(--fondo);background-size:cover;background-position:center}
+#velo{position:fixed;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,0) 20%,rgba(0,0,0,0) 72%,rgba(0,0,0,.20))}
+
+/* tipografia comun a las dos capas */
+.capa{position:fixed;left:50%;top:var(--top);width:max-content;
+  font-family:inherit;font-weight:var(--grosor);font-size:var(--alto);
+  line-height:.78;letter-spacing:-.012em;white-space:nowrap;
+  transform-origin:50% 0;
+  transform:translateX(calc(-50% + var(--dx))) scale(var(--kx),var(--ky))}
+/* los dos puntos del colon: circulos, no se estrechan con el resto */
+.colon{display:inline-block;position:relative;width:.30em;height:0;vertical-align:baseline}
+.colon i{position:absolute;left:50%;width:.062em;height:.062em;margin-left:-.031em;border-radius:50%;
+  transform:scaleX(calc(1/var(--kx)));background:rgba(255,255,255,.34);
+  box-shadow:0 0 26px rgba(205,236,255,.45),inset 0 0 8px rgba(255,255,255,.35)}
+.colon i:first-child{top:-.531em}
+.colon i:last-child{top:-.239em}
+#vidrio .colon i{background-image:none;background:rgba(226,242,255,.50);filter:none;box-shadow:none}
+#vidrio .colon i:last-child{background:rgba(120,220,255,.85)}
+
+/* capa 2: el fondo visto a traves del vidrio (mismo encuadre que la pagina -> refraccion alineada) */
+#vidrio{position:fixed;inset:0;pointer-events:none;
+  background-image:var(--fondo);background-size:112% 112%;background-position:center;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:brightness(1.45) saturate(1.05) contrast(1.06) blur(2.4px)}
+#vidrio .capa{color:transparent}
+
+/* capa 3: el cristal de encima (tinte, borde y brillo) */
+#reloj{color:var(--tinte)}
+#reloj .d{position:relative}
+#reloj .d::after{content:none}
+.filo{-webkit-text-stroke:1.5px rgba(255,255,255,.30);text-shadow:0 0 16px rgba(205,236,255,.38)}
+
+/* ---------- panel de ajustes (oculto) ---------- */
+#panel{position:fixed;inset:0;display:none;background:rgba(6,10,16,.95);color:#e8eef5;
+  font-family:-apple-system,Inter,Arial,sans-serif;font-size:15px;z-index:9;overflow:auto;
+  padding:calc(env(safe-area-inset-top,0px) + 24px) 20px 34px}
+#panel.abierto{display:block}
+#panel h1{font-size:19px;font-weight:600;margin-bottom:4px}
+#panel p{color:#9aa7b6;font-size:13.5px;line-height:1.5;margin-bottom:12px}
+#panel label{display:block;font-size:13px;color:#9aa7b6;margin:14px 0 6px}
+#panel input[type=number]{width:96px;font-size:16px;padding:8px 10px;border-radius:9px;border:1px solid #2b3446;background:#141a26;color:#fff}
+#panel input[type=file]{width:100%;font-size:13px;color:#cfd8e3;margin-top:4px}
+#panel button{display:block;width:100%;margin-top:12px;padding:13px;border-radius:11px;border:0;background:#2b6cf6;color:#fff;font-size:15.5px;font-weight:600}
+#panel .sec{background:#151b26;border:1px solid #232c3a;border-radius:13px;padding:14px;margin-top:14px}
+#panel a{color:#6cb6ff}
+.fila{display:flex;gap:10px;align-items:center}
+#v{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 2px);text-align:center;color:#fff;
+  font:12px/1 -apple-system,Arial;opacity:.8;transition:opacity .8s;pointer-events:none;z-index:8}
+#v.oculto{opacity:0}
+#pista{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 36px);text-align:center;z-index:7}
+#pista button{padding:13px 22px;border:0;border-radius:999px;background:rgba(255,255,255,.15);color:#fff;
+  font:600 15px -apple-system,Arial;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#pista.oculto{display:none}
+#aviso{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 96px);transform:translateX(-50%);
+  background:rgba(0,0,0,.82);color:#fff;padding:9px 16px;border-radius:10px;font:13px -apple-system,Arial;
+  opacity:0;transition:opacity .3s;z-index:10;pointer-events:none;max-width:86vw;text-align:center}
+</style>
+</head>
+<body>
+<div id="fondo"></div>
+<div id="vidrio"><span class="capa" id="c2"></span></div>
+<span class="capa" id="reloj"></span>
+<div id="velo"></div>
+<div id="v">v1</div>
+<div id="pista"><button type="button" id="elegir">Elegir fondo de pantalla</button></div>
+<div id="aviso"></div>
+
+<div id="panel">
+  <h1>Reloj</h1>
+  <p>Pulsa la pantalla: cada toque retrocede el reloj un minuto. Arranca con los minutos de adelanto que pongas abajo, así que a los 5 toques vuelve a la hora real.</p>
+  <div class="sec">
+    <strong>Fondo de pantalla</strong>
+    <p style="margin:8px 0 6px">Sube la imagen de tu pantalla de bloqueo. Se guarda solo en este móvil.</p>
+    <input type="file" id="fichero" accept="image/*">
+    <button type="button" id="quitar">Quitar el fondo</button>
+  </div>
+  <div class="sec">
+    <strong>La forma de los dígitos</strong>
+    <p style="margin:8px 0 6px">Toca los números y mira cómo cambia la pantalla. Así se clava la forma exacta.</p>
+    <label>Minutos de adelanto al arrancar</label>
+    <input type="number" id="min" min="1" max="30" step="1">
+    <label>Tamaño</label>
+    <input type="number" id="alto" step="1">
+    <label>Ancho (1 = normal, menos = más estrecho)</label>
+    <input type="number" id="kx" step="0.02">
+    <label>Alto</label>
+    <input type="number" id="ky" step="0.02">
+    <label>Grosor (300 fino - 700 grueso)</label>
+    <input type="number" id="grosor" step="100">
+    <label>Desde arriba (%)</label>
+    <input type="number" id="top" step="0.5">
+    <label>Desde la izquierda (%)</label>
+    <input type="number" id="izq" step="0.5">
+  </div>
+  <button type="button" id="cerrar">Listo</button>
+  <p style="margin-top:14px;text-align:center"><a href="#" id="salir">Cerrar sin dejar rastro</a></p>
+</div>
+
+<script>
+(function(){
+  var q=function(s){return document.querySelector(s)};
+  var clav={alto:52.7,kx:0.442,ky:1,top:8.83,izq:0.5,g:700,min:5};
+  var off, fondo=null, forzada=null;
+  var c1=q('#reloj'), c2=q('#c2'), ultimo='';
+
+  // ---- parametros en la URL (para pruebas): ?t=11:44&v=1
+  var par=new URLSearchParams(location.search);
+  if(par.get('t')&&/^\d\d:\d\d$/.test(par.get('t'))) forzada=par.get('t').replace(':','');
+  var modoTinta=par.get('ink')==='1';
+
+  function leer(){try{var s=localStorage.getItem('relojClav');
+    if(s){var o=JSON.parse(s);for(var k in o)if(k in clav)clav[k]=+o[k];}
+    fondo=localStorage.getItem('relojFondo')||null;}catch(e){}}
+  function guardar(){try{localStorage.setItem('relojClav',JSON.stringify(clav))}catch(e){}}
+  function pintaClav(){
+    ['min','alto','kx','ky','grosor','top','izq'].forEach(function(k){q('#'+k).value=clav[k]});
+    var st=document.documentElement.style;
+    st.setProperty('--alto',clav.alto+'vh');
+    st.setProperty('--kx',clav.kx);st.setProperty('--ky',clav.ky);
+    st.setProperty('--grosor',clav.grosor);
+    st.setProperty('--top',clav.top+'%');st.setProperty('--dx',(clav.izq||0)+'%');
+  }
+  function pintaFondo(){
+    document.documentElement.style.setProperty('--fondo',
+      fondo?'url("'+fondo+'")':'linear-gradient(160deg,#0b1622 0%,#123047 45%,#06121c 100%)');
+    q('#pista').className=fondo?'oculto':'';
+  }
+  function dos(n){return (n<10?'0':'')+n}
+
+  function pinta(){
+    var t;
+    if(forzada)t=forzada;
+    else{var d=new Date(Date.now()+off*60000);t=dos(d.getHours())+dos(d.getMinutes());}
+    if(t===ultimo)return;
+    var prev=ultimo;ultimo=t;
+    var h='';
+    for(var i=0;i<4;i++){
+      if(i===2)h+='<span class="colon"><i></i><i></i></span>';
+      var g=t[i], cambia=(prev&&prev[i]!==g);
+      h+='<span class="d'+(cambia?' r':'')+'">'+g+'</span>';
+    }
+    c1.innerHTML=h;c2.innerHTML=h;
+  }
+
+  var est=document.createElement('style');
+  est.textContent='#reloj .r{animation:baja .22s ease-out}#reloj .filo{-webkit-text-stroke:1.5px rgba(255,255,255,.30);text-shadow:0 0 16px rgba(205,236,255,.38)}'+
+    '@keyframes baja{from{opacity:0;transform:translateY(.12em)}to{opacity:1;transform:none}}';
+  document.head.appendChild(est);
+  c1.className='capa filo';
+
+  function tick(){pinta();setTimeout(tick,(61-new Date().getSeconds())*1000)}
+
+  // ---------- toques ----------
+  var pulsando=false,t0=0,esquina=0, tmr=null;
+  function rearma(){off=clav.min;pinta();avisa('Listo: '+clav.min+' min por delante')}
+  function avisa(x){var a=q('#aviso');a.textContent=x;a.style.opacity=1;clearTimeout(a._t);
+    a._t=setTimeout(function(){a.style.opacity=0},1300)}
+  function dentro(e){return !!(e.target.closest&&(e.target.closest('#panel')||e.target.closest('#pista')))}
+
+  document.addEventListener('touchstart',function(e){
+    if(dentro(e))return;pulsando=true;t0=Date.now();
+    clearTimeout(tmr);tmr=setTimeout(function(){pulsando=false;rearma()},800);
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(!pulsando)return;pulsando=false;clearTimeout(tmr);
+    if(dentro(e))return;
+    if(Date.now()-t0>700)return;
+    var u=e.changedTouches[0];
+    if(u.clientX>innerWidth*0.70&&u.clientY<innerHeight*0.12){   // esquina: 3 toques -> ajustes
+      esquina++;setTimeout(function(){esquina=0},1500);
+      if(esquina>=3){esquina=0;q('#panel').className='abierto';q('#pista').className='oculto'}
+      return;
+    }
+    if(forzada)return;
+    if(off>0){off--;pinta()}
+  },{passive:true});
+  document.addEventListener('click',function(e){                    // raton, para pruebas
+    if(dentro(e))return;
+    if(e.clientX>innerWidth*0.70&&e.clientY<innerHeight*0.12){esquina++;setTimeout(function(){esquina=0},1500);
+      if(esquina>=3){esquina=0;q('#panel').className='abierto';q('#pista').className='oculto'}return}
+    if(forzada)return;
+    if(off>0){off--;pinta()}
+  });
+
+  // ---------- panel ----------
+  q('#cerrar').onclick=function(){q('#panel').className=''};
+  ['min','alto','kx','ky','grosor','top','izq'].forEach(function(k){
+    q('#'+k).oninput=function(){clav[k]=+this.value||clav[k];guardar();pintaClav()};
+  });
+  q('#quitar').onclick=function(){fondo=null;try{localStorage.removeItem('relojFondo')}catch(e){}pintaFondo()};
+  q('#elegir').onclick=function(){q('#panel').className='abierto';q('#pista').className='oculto'};
+  q('#salir').onclick=function(e){e.preventDefault();
+    location.replace('https://www.google.es/search?q='+encodeURIComponent('clima'))};
+  q('#fichero').onchange=function(){
+    var f=this.files&&this.files[0];if(!f)return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      var img=new Image();
+      img.onload=function(){
+        var max=1700,esc=Math.min(1,max/Math.max(img.width,img.height));
+        var c=document.createElement('canvas');
+        c.width=Math.round(img.width*esc);c.height=Math.round(img.height*esc);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        var out=null;try{out=c.toDataURL('image/jpeg',.88)}catch(e){}
+        fondo=out||fr.result;
+        try{localStorage.setItem('relojFondo',fondo)}catch(e){avisa('Fondo puesto (no se guardará al cerrar)')}
+        pintaFondo();
+      };
+      img.onerror=function(){fondo=fr.result;pintaFondo();avisa('Fondo puesto')};
+      img.src=fr.result;
+    };
+    fr.readAsDataURL(f);
+  };
+
+  // ---------- pantalla despierta ----------
+  function vigila(){if(navigator.wakeLock&&navigator.wakeLock.request){
+    navigator.wakeLock.request('screen').catch(function(){})}}
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)vigila()});
+
+  leer();
+  if(modoTinta){document.documentElement.style.setProperty('--tinte','#fff');
+    document.documentElement.style.setProperty('--fondo','#000');
+    document.getElementById('vidrio').style.display='none';
+    document.getElementById('fondo').style.display='none';
+    document.getElementById('velo').style.display='none';
+    document.getElementById('v').style.display='none';
+    document.getElementById('aviso').style.display='none';
+    c1.className='capa';}
+  if(par.get('kx'))clav.kx=+par.get('kx');
+  if(par.get('ky'))clav.ky=+par.get('ky');
+  if(par.get('alto'))clav.alto=+par.get('alto');
+  if(par.get('top'))clav.top=+par.get('top');
+  if(par.get('izq'))clav.izq=+par.get('izq');
+  if(par.get('g'))clav.grosor=+par.get('g');
+  off=clav.min;
+  pintaClav();pintaFondo();vigila();pinta();tick();
+  setTimeout(function(){q('#v').className='oculto'},1600);
+  window.__reloj={clav:clav,off:function(){return off},pon:function(v){off=v;pinta()}};
+})();
+</script>
+</body>
+</html>
