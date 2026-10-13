@@ -77,20 +77,18 @@ body{
 #panel a{color:#6cb6ff}
 .fila{display:flex;gap:10px;align-items:center}
 /* ---- barra de estado falsa + brillo para tapar la hora del sistema ---- */
-#halo{position:fixed;left:0;right:0;top:0;z-index:36;pointer-events:none;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 52%,rgba(0,0,0,.55) 78%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 52%,rgba(0,0,0,.55) 78%,transparent 100%)}
+#halo{position:fixed;left:0;right:0;top:0;width:100%;z-index:36;pointer-events:none;height:calc(var(--btop,0px) + 10px);background:linear-gradient(180deg,#fff 0,rgba(255,255,255,1) calc(100% - 10px),rgba(255,255,255,0) 100%);opacity:1}
 #barra{position:fixed;left:0;right:0;top:0;height:var(--btop,0px);z-index:38;pointer-events:none;
   display:flex;align-items:center;justify-content:space-between;overflow:hidden;
-  font:600 15px/1 -apple-system,'SF Pro Text',system-ui,sans-serif;color:rgba(255,255,255,.94)}
-#oper{margin-left:26px;letter-spacing:.1px;white-space:nowrap}
-#ico{margin-right:17px;display:flex;align-items:center;gap:5px;fill:rgba(255,255,255,.94)}
-#pil{position:relative;width:27px;height:13px;border:1.4px solid rgba(255,255,255,.72);border-radius:4px;box-sizing:border-box}
-#pil::after{content:"";position:absolute;right:-2.6px;top:3.6px;width:1.8px;height:4.6px;background:rgba(255,255,255,.72);border-radius:0 1.5px 1.5px 0}
-#pil i{position:absolute;left:1.4px;top:1.4px;bottom:1.4px;width:calc((27px - 4.6px) * var(--carga,.84));background:rgba(255,255,255,.97);border-radius:2px}
-#pct{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:700 9.5px/1 -apple-system,system-ui,sans-serif;color:#0b0b0e}
+  font:600 15px/1 -apple-system,'SF Pro Text',system-ui,sans-serif;color:#0b0b0e}
+#oper{margin-left:26px;letter-spacing:.1px;white-space:nowrap;text-shadow:none}
+#ico{margin-right:14px;display:flex;align-items:center;gap:5px;fill:#0b0b0e}
+#pil{position:relative;width:27px;height:13px;border:1.4px solid #0b0b0e;border-radius:4px;box-sizing:border-box}
+#pil::after{content:"";position:absolute;right:-2.6px;top:3.6px;width:1.8px;height:4.6px;background:#0b0b0e;border-radius:0 1.5px 1.5px 0}
+#pil i{position:absolute;left:1.4px;top:1.4px;bottom:1.4px;width:calc((27px - 4.6px) * var(--carga,.84));background:#0b0b0e;border-radius:2px}
+#pct{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:700 9.5px/1 -apple-system,system-ui,sans-serif;color:var(--pctColor,#fff)}
 #panel h1{margin-top:calc(var(--btop,0px) + 6px)}
-#v{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 2px);text-align:center;color:#fff;
+#v{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 2px);text-align:center;color:#59607a;
   font:12px/1 -apple-system,Arial;opacity:.8;transition:opacity .8s;pointer-events:none;z-index:8}
 #v.oculto{opacity:0}
 #pista{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 36px);text-align:center;z-index:7}
@@ -112,7 +110,7 @@ body{
 <svg viewBox="0 0 16 12" width="16" height="12" aria-hidden="true"><path d="M8 11.3 5.8 8.9a3.1 3.1 0 0 1 4.4 0L8 11.3Zm-3.7-4a5.7 5.7 0 0 1 7.4 0l1.3-1.5a7.6 7.6 0 0 0-10 0l1.3 1.5Zm-2.6-2.8a9.4 9.4 0 0 1 12.6 0L15.6 3a11.3 11.3 0 0 0-15.2 0l1.3 1.5Z"/></svg>
 <span id="pil"><i></i><b id="pct">84</b></span></span></div>
 <div id="velo"></div>
-<div id="v">v3</div>
+<div id="v">v4</div>
 <div id="pista"><button type="button" id="elegir">Elegir fondo de pantalla</button></div>
 <div id="aviso"></div>
 
@@ -124,7 +122,7 @@ body{
     <p style="margin:8px 0 6px">La barra de arriba de iOS no se puede quitar desde una web (no existe esa opción en Safari). Así que dibujo una igual encima —operador, cobertura, wifi y bater&#237;a— y aclaro la parte de arriba para que la hora real del sistema no se lea.</p>
     <label>Operador<input type="text" id="oper" value="vodafone ES"></label>
     <label>Bater&#237;a %<input type="number" id="bat" min="1" max="100" step="1" value="84"></label>
-    <label>Brillo de arriba para tapar la hora (0-100)<input type="range" id="brillo" min="0" max="100" step="5" value="88"></label>
+    <label>Opacidad de la banda blanca (0-100)<input type="range" id="brillo" min="0" max="100" step="5" value="100"></label>
     <label>Alto de la barra (0 = el del m&#243;vil)<input type="number" id="balto" min="0" max="90" step="1" value="0"></label>
     <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="ver" style="width:auto">Mostrar la barra</label>
   </div>
@@ -237,7 +235,7 @@ body{
     clearTimeout(tmr);tmr=setTimeout(function(){pulsando=false;rearma()},800);
   },{passive:true});
   /* ---- barra de estado falsa: config, medida del hueco de arriba y pintado ---- */
-var bar={oper:'vodafone ES',bat:84,brillo:88,ver:1,alto:0};
+var bar={oper:'vodafone ES',bat:84,brillo:100,ver:1,alto:0};
 function cargaBar(){try{var x=localStorage.getItem('relojBarra');if(x){var o=JSON.parse(x);for(var k in o)bar[k]=o[k];}}catch(e){}}
 function guardaBar(){try{localStorage.setItem('relojBarra',JSON.stringify(bar));}catch(e){}}
 function insetTop(){var d=document.createElement('div');
@@ -246,40 +244,14 @@ function insetTop(){var d=document.createElement('div');
 function fuenteFondo(){var v=getComputedStyle(document.documentElement).getPropertyValue('--fondo')||'';
   var m=/url\(["']?([^"')]+)["']?\)/.exec(v);return m?m[1]:'';}
 var _hi=null,_hs='';
-function pintaHalo(){
-  var c=document.getElementById('halo'); if(!c) return;
-  var w=Math.round(innerWidth), H=Math.round(innerHeight);
-  var h=Math.round((bar.alto>0?bar.alto:(insetTop()||22))+40);
-  c.style.height=h+'px';
-  if(c.width!==w||c.height!==h){c.width=w;c.height=h;}
-  var g=c.getContext('2d'); g.clearRect(0,0,w,h);
-  var src=fuenteFondo();
-  if(src!==_hs){_hs=src;_hi=src?new Image():null;if(_hi){_hi.onload=pintaHalo;_hi.onerror=pintaHalo;_hi.src=src;}}
-  if(_hi&&_hi.complete&&_hi.naturalWidth){
-    var e=Math.max(w/_hi.naturalWidth,H/_hi.naturalHeight);
-    var iw=_hi.naturalWidth*e, ih=_hi.naturalHeight*e, ox=(w-iw)/2, oy=(H-ih)/2;
-    var peq=document.createElement('canvas'); peq.width=Math.max(2,Math.round(w/14)); peq.height=Math.max(2,Math.round(h/14));
-    var pg=peq.getContext('2d'); pg.imageSmoothingQuality='high';
-    pg.drawImage(_hi,ox/14,oy/14,iw/14,ih/14);
-    g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
-    g.drawImage(peq,0,0,peq.width,peq.height,0,0,w,h);
-  } else { g.fillStyle='#e7ecf2'; g.fillRect(0,0,w,h); }
-  var b=Math.max(0,Math.min(1,(+bar.brillo||0)/100));
-  g.globalCompositeOperation='source-over';
-  g.fillStyle='rgba(255,255,255,'+(b*0.94).toFixed(3)+')'; g.fillRect(0,0,w,h);
-  g.globalCompositeOperation='destination-out';
-  var gr=g.createLinearGradient(0,0,0,h);
-  gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(.5,'rgba(0,0,0,0)');
-  gr.addColorStop(.76,'rgba(0,0,0,.45)'); gr.addColorStop(1,'rgba(0,0,0,1)');
-  g.fillStyle=gr; g.fillRect(0,0,w,h); g.globalCompositeOperation='source-over';
-}
+function pintaHalo(){document.getElementById('halo').style.opacity=bar.brillo/100;}
 function pintaBar(){
   var it=insetTop(); var h=bar.alto>0?bar.alto:(it>0?it:22);
   document.documentElement.style.setProperty('--btop',h+'px');
   var eo=document.getElementById('oper'); if(eo) eo.textContent=bar.oper||'';
   var eb=document.getElementById('barra'); if(eb) eb.style.display=bar.ver?'flex':'none';
   var ep=document.getElementById('pil'); if(ep) ep.style.setProperty('--carga',(Math.max(0,Math.min(100,+bar.bat||0))/100));
-  var ec=document.getElementById('pct'); if(ec) ec.textContent=Math.round(+bar.bat||0);
+  var ec=document.getElementById('pct'); if(ec){ec.textContent=Math.round(+bar.bat||0);var ep=document.getElementById('pil'); if(ep) ep.style.setProperty('--pctColor',(+bar.bat>=52?'#fff':'#0b0b0e'));}
   pintaHalo();
 }
 cargaBar();
